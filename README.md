@@ -1,8 +1,8 @@
 # GTA 6 Meme: Eviction Notice for GTA VI
 
 [![Bounty](https://make.fun/badge/gta6-meme-x-01.svg)](https://make.fun/bounty/gta6-meme-x-01)
-[![Rank](https://make.fun/badge/gta6-meme-x-01/Indramunggahari10/gta6-meme-x-01-v5-ono10/rank.svg)](https://make.fun/bounty/gta6-meme-x-01)
-[![Reward](https://make.fun/badge/gta6-meme-x-01/Indramunggahari10/gta6-meme-x-01-v5-ono10/reward.svg)](https://make.fun/bounty/gta6-meme-x-01)
+[![Rank](https://make.fun/badge/gta6-meme-x-01/vjmunggahari-ui/gta6-meme-x-01-v5-ono10/rank.svg)](https://make.fun/bounty/gta6-meme-x-01)
+[![Reward](https://make.fun/badge/gta6-meme-x-01/vjmunggahari-ui/gta6-meme-x-01-v5-ono10/reward.svg)](https://make.fun/bounty/gta6-meme-x-01)
 
 ![Eviction notice served on Grand Theft Auto VI by the Leonida Housing Authority](eviction-notice.png)
 
