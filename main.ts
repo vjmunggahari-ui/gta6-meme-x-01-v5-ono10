@@ -4,8 +4,9 @@
 // its text. This program's only job is to place a faithful copy of
 // POST.json into the output directory the house reads.
 //
-// POST.json still holds its placeholder address: the real post address
-// goes in before the entry is submitted, or the gate refuses it.
+// POST.json now holds the live post address (verified on X before the
+// entry is submitted); the placeholder check below still guards against
+// a half-finished edit shipping a non-post address.
 //
 // Local run:
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
@@ -56,11 +57,14 @@ if (url !== placeholder && !postAddress.test(url)) {
 
 writeFileSync(outPath, bytes);
 
-// Read-back self-check, two ways: the copy in the output directory must
-// match the repository's POST.json byte for byte, and the sha256 of what
-// was written must equal the sha256 of what was read. Either check failing
-// means a short or mangled write handed the gate a broken file, so fail
-// loudly instead of exiting 0.
+// Read-back self-check, four ways: the copy in the output directory must
+// match the repository's POST.json byte for byte; the sha256 of what was
+// written must equal the sha256 of what was read; the written file must be
+// the same size; and re-parsing the written copy must give back exactly
+// the same object (same keys, same url) — a byte-identical file that no
+// longer parses, or parses to a different post, is just as broken as a
+// truncated one. Any check failing means a short or mangled write handed
+// the gate a broken file, so fail loudly instead of exiting 0.
 const back = readFileSync(outPath);
 if (!back.equals(bytes)) {
   fail(`POST.json in ${outDir} does not match ${inPath}`);
@@ -70,8 +74,30 @@ const digest = (data: Buffer) =>
 if (digest(back) !== digest(bytes)) {
   fail(`POST.json sha256 mismatch after write to ${outPath}`);
 }
+if (back.length !== bytes.length) {
+  fail(
+    `POST.json size mismatch after write: ${back.length} bytes in ` +
+      `${outPath}, ${bytes.length} bytes read from ${inPath}`,
+  );
+}
+let backParsed: unknown;
+try {
+  backParsed = JSON.parse(back.toString("utf8"));
+} catch {
+  fail(`POST.json written to ${outPath} does not parse as JSON`);
+}
+const backUrl = (backParsed as { url?: unknown } | null)?.url;
+const backKeys = Object.keys(backParsed as object).sort().join(",");
+const inKeys = Object.keys(parsed as object).sort().join(",");
+if (backUrl !== url || backKeys !== inKeys) {
+  fail(
+    `POST.json round-trip mismatch: written copy has url ${String(backUrl)} ` +
+      `and keys [${backKeys}], expected url ${url} and keys [${inKeys}]`,
+  );
+}
 
 console.log(
   `POST.json written to ${outPath} (${bytes.length} bytes, ` +
-    `sha256 ${digest(back).slice(0, 12)}…, verified)`,
+    `sha256 ${digest(back).slice(0, 12)}…, verified: ` +
+    `byte-identical, size ${back.length}, url ${url})`,
 );
